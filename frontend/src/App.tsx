@@ -1,18 +1,42 @@
 import "./App.css";
 import { useState } from "react";
-import { Button } from "./components/ui/button";
+import Layout from "@/components/Layout";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 
 function App() {
 	const [count, setCount] = useState<number>(0);
 
 	return (
-		<div className="px-96 py-8 bg-zinc-200 min-w-full min-h-screen">
-			<div className="w-full h-32 bg-white shadow rounded-2xl p-4">
+		<Layout>
+			{/* <div className="w-full h-32 bg-white shadow rounded-2xl p-4">
 				<Button onClick={() => setCount(count + 1)}>
 					Count: {count}
 				</Button>
-			</div>
-		</div>
+			</div> */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Example Card</CardTitle>
+					<CardDescription>
+						A description would go here.
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<p>Some content here.</p>
+					<Button onClick={() => setCount(count + 1)}>
+						Count: {count}
+					</Button>
+				</CardContent>
+				<CardFooter>Footer here.</CardFooter>
+			</Card>
+		</Layout>
 	);
 }
 
