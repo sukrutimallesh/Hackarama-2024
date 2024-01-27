@@ -11,31 +11,47 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-function App() {
-	const [count, setCount] = useState<number>(0);
+type Article = {
+	title: string;
+	date: string;
+	link: string;
+};
 
+const exampleData: Article[] = [
+	{
+		title: "Small Boeing suppliers lament new turmoil around 737 planes",
+		date: "January 25, 2024",
+		link: "https://www.reuters.com/business/aerospace-defense/small-boeing-suppliers-lament-new-turmoil-around-737-planes-2024-01-26/",
+	},
+	{
+		title: "Forbes' unionized journalists stage first walk-out in magazine's history",
+		date: "January 25, 2024",
+		link: "https://www.reuters.com/business/media-telecom/forbes-unionized-journalists-stage-first-walk-out-magazines-history-2024-01-25/",
+	},
+	{
+		title: "PayPal to launch AI-based products as new CEO aims to revive share price",
+		date: "January 25, 2024",
+		link: "https://www.reuters.com/business/paypal-launch-ai-based-products-new-ceo-aims-revive-share-price-2024-01-25/",
+	},
+];
+
+function App() {
 	return (
 		<Layout>
-			{/* <div className="w-full h-32 bg-white shadow rounded-2xl p-4">
-				<Button onClick={() => setCount(count + 1)}>
-					Count: {count}
-				</Button>
-			</div> */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Example Card</CardTitle>
-					<CardDescription>
-						A description would go here.
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<p>Some content here.</p>
-					<Button onClick={() => setCount(count + 1)}>
-						Count: {count}
-					</Button>
-				</CardContent>
-				<CardFooter>Footer here.</CardFooter>
-			</Card>
+			{exampleData.map((article) => {
+				return (
+					<a href={article.link}>
+						<Card>
+							<CardHeader>
+								<CardTitle>{article.title}</CardTitle>
+								<CardDescription>
+									{article.date}
+								</CardDescription>
+							</CardHeader>
+						</Card>
+					</a>
+				);
+			})}
 		</Layout>
 	);
 }
