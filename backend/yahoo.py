@@ -90,16 +90,20 @@ def main() -> None:
     links: list[str] = getLinksFromNewsPage()
     links = links[:100] if len(links) > 100 else links
 
+    article_infos: list[dict] = []
+
     # Get the info from each link (Client utilizes the underlying TCP connection for faster requests)
     with httpx.Client(timeout=10) as client:
         for i, link in enumerate(links):
             info = getInfoFromArticle(client, link)
-            pprint.pprint(info)
-            print("\n\n")
+            article_infos.append(info)
 
-            if i == 20:
+            # TODO: Delete once you want all 100 articles
+            if i == 9:
                 break
-
+    
+    pprint.pprint(article_infos)
+    print(len(article_infos))
 
 if __name__ == "__main__":
     main()
