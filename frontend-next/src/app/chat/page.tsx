@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ChatHistoryObj } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
+import { Sparkles } from "lucide-react";
 
 const baseChatHistory: ChatHistoryObj[] = [
 	{
@@ -67,8 +68,12 @@ export default function ChatPage() {
 					className="resize-y drop-shadow-lg w-full"
 				/>
 				<div className="flex flex-col gap-2">
-					<Button onClick={getAIResponse} className="w-full">
-						Ask
+					<Button
+						onClick={getAIResponse}
+						className="w-full flex gap-1"
+					>
+						<span>Ask</span>
+						<Sparkles className="w-4 h-4" />
 					</Button>
 					<Link href="/" className="w-full">
 						<Button
