@@ -1,34 +1,17 @@
 # investingcom.py - Get article links from investing.com.
 
+# Native imports
 import requests
 from bs4 import BeautifulSoup, Tag
 import csv
 import pprint
 
+# Third Party imports
+import httpx
+from httpx import Client
+
 BASE_URL: str = "https://www.investing.com"
 STOCK_MARKET_NEWS_URL: str = "https://www.investing.com/news/stock-market-news/"
-
-
-# def getContent(url, div_class):
-#     article_response = requests.get(complete_link)
-#     article_soup = BeautifulSoup(article_response.text, 'html.parser')
-
-#     # Find specific div element that contains the article content
-#     target_div = article_soup.find('div', class_=div_class)
-
-#     if target_div:
-#         # Extract all <p> tags from the div element
-#         paragraphs = target_div.find_all('p')
-#         # Concatenate all <p> tags into one string
-#         concatenated_text = ' '.join([p.get_text() for p in paragraphs])
-            
-#         return concatenated_text
-#     # If the div element is not found, return None
-#     else:
-#         print(f"Could not find a <div> with class '{div_class}' on {url}.")
-#         return None
-
-
 
 def getArticleLinks(link: str) -> list[str] | None:
     # Make request to the news page
@@ -57,48 +40,71 @@ def getArticleLinks(link: str) -> list[str] | None:
 
     return links
 
+def getInfoFromArticle(client: Client, url:str) -> dict[str, str | list[str] | None]:
+    r = client.get(url)
+    
+    # Parse the HTML content
+    soup = BeautifulSoup(r.text, 'html.parser')
+
+    # Get main section for articles (element with an id of "leftColumn")
+    main_element: Tag = soup.select_one("#leftColumn")
+
+    # Get the article title
+    title_element: Tag = main_element.select_one("h1.articleHeader")
+    title: str = title_element.text
+
+    # Get all the <a> tags with a class of "title"
+    img_element: Tag | None = soup.select_one("#carouselImage")
+
+    image_url: str | None = None
+    try:
+        image_url = img_element["src"]
+    except:
+        image_url = None
+
+    # Get the article main content
+    main_content_element: Tag = soup.select_one("div.WYSIWYG.articlePage")
+
+    # Get all the <p> tags
+    p_elements: list[Tag] = list(main_content_element.select("p"))
+
+    # Join all the <p> tags into one string
+    text_content: str = "\n".join([p.getText() for p in p_elements])
+
+    unwanted_text = "Position added successfully to:"
+    text_content = text_content.replace(unwanted_text, "")
+
+    return {
+        "title": title,
+        "article_url": url,
+        "image_url": image_url,
+        "tags": [],     # Empty tags for now
+        "article_content": text_content,
+    }
 
 def main() -> None:
-    for i in range(1, 2):
+    all_links: list[str] = []
+    for i in range(1, 6):
         # Create the current link by appending the current index number to the end of the URL
         currentLink: str = STOCK_MARKET_NEWS_URL + str(i)
 
         # Get all the article links for the current news page
         links = getArticleLinks(currentLink)
-        pprint.pprint(links)
-        print(len(links))
+        all_links = all_links + links
 
+    pprint.pprint(all_links)
+    print(len(all_links))
 
-    #     # Write the extracted article's title, link, and summary to a CSV file
-    #     with open('investingArticles.csv', 'a', newline='', encoding='utf-8') as csv_file:
-    #         csv_writer = csv.writer(csv_file)
-            
-    #         # Write header to CSV file
-    #         if csv_file.tell() == 0:
-    #             csv_writer.writerow(['Title', 'Article URL', 'Image URL', 'Article Content', 'Tags'])
+    article_infos: list[dict] = []
 
-    #         for article in article_titles: 
-    #             # Write article titles to CSV file
-    #             title_elem = article.find('a', class_='title') 
-    #             title = title_elem.text.strip()
-    #             print(title)
+    # Get the info from each link (Client utilizes the underlying TCP connection for faster requests)
+    with httpx.Client(timeout=10) as client:
+        for i, link in enumerate(all_links):
+            info = getInfoFromArticle(client, link)
+            articles_info.append(info)
 
-    #             # Write article links to CSV file
-    #             link = title_elem['href']
-    #             complete_link = 'https://www.investing.com'+ link
-    #             print(complete_link)
-
-    #             # Write img links to CSV file
-    #             image_elem = article.find('img', class_=' ls-is-cached lazyloaded')
-    #             image_link = image_elem['data-src']
-    #             print(image_link)
-
-    #             article_content = getContent(complete_link, "WYSIWYG articlePage")
-
-    #             csv_writer.writerow([title, complete_link, image_link, article_content])
-
-    # print("Article information has been successfully written to investingArticles.csv.")
-
+    pprint.pprint(article_infos)
+    print(len(article_infos))
 
 if __name__ == "__main__":
     main()
