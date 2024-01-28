@@ -1,31 +1,29 @@
-import requests
-from bs4 import BeautifulSoup, Tag
+# yahoo.py - Scroll the Yahoo Finance "News" page several times and get info from 100 news links.
+
+# Native imports
 import pprint
 import time
 
+# Third Party imports
+import httpx
+from httpx import Client
+from bs4 import BeautifulSoup, Tag
+
+# User imports
 from classes.SeleniumScraper import SeleniumScraper
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException
 
-
+# Constants
 BASE_URL: str = "https://finance.yahoo.com"
 MAIN_URL: str = "https://finance.yahoo.com/news/"
-TEST_URL: str = "https://finance.yahoo.com/news/covid-era-program-awash-fraud-141658128.html"
 
 
 def getLinksFromNewsPage() -> list[str]:
     # Create the scraper instance and navigate to URL
-    scraper: SeleniumScraper = SeleniumScraper(MAIN_URL, False)
+    scraper: SeleniumScraper = SeleniumScraper(MAIN_URL, True)
 
-    # Scroll to the bottom of the page 5 times
-    for i in range(5):
+    # Scroll to the bottom of the page several times
+    for i in range(10):
         scraper.scrollToBottomAndWait()
     
     # Get the soup from the page
@@ -51,17 +49,23 @@ def getLinksFromNewsPage() -> list[str]:
     return links
 
 
-def getInfoFromArticle(url: str) -> dict[str, str | list[str]]:
-    r = requests.get(url)
+def getInfoFromArticle(client: Client, url: str) -> dict[str, str | list[str] | None]:
+    r = client.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
 
     # Find the title element and get its text
     title_element: Tag = soup.select_one("#caas-lead-header-undefined")
     title: str = title_element.text
 
-    # Find the image element and get its src url (it's always part of a figure)
-    img_element: Tag = soup.select_one(".caas-figure img.caas-img")
-    image_url: str = img_element["src"]
+    # Find the image element (it's always part of a figure)
+    img_element: Tag | None = soup.select_one(".caas-figure img.caas-img")
+    
+    # Some articles do not have an image or it is bugged, just discard the image in both cases
+    image_url: str | None = None
+    try:
+        image_url = img_element["src"]
+    except:
+        image_url = None
 
     # Find the element that holds the main content
     main_content_element: Tag = soup.select_one(".caas-body")
@@ -81,12 +85,20 @@ def getInfoFromArticle(url: str) -> dict[str, str | list[str]]:
     }
 
 
-def main():
-    # links: list[str] = getLinksFromNewsPage(scraper)
-    # pprint.pprint(links)
+def main() -> None:
+    # Get the links, only keep 100 of them if > 100 options
+    links: list[str] = getLinksFromNewsPage()
+    links = links[:100] if len(links) > 100 else links
 
-    info = getInfoFromArticle(TEST_URL)
-    pprint.pprint(info)
+    # Get the info from each link (Client utilizes the underlying TCP connection for faster requests)
+    with httpx.Client(timeout=10) as client:
+        for i, link in enumerate(links):
+            info = getInfoFromArticle(client, link)
+            pprint.pprint(info)
+            print("\n\n")
+
+            if i == 20:
+                break
 
 
 if __name__ == "__main__":
