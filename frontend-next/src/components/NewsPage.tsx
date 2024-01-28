@@ -46,7 +46,7 @@ export default function NewsPage({ articles }: NewsPageInterface) {
 									<Button
 										variant="outline"
 										size="icon"
-										className="rounded-full p-2 group"
+										className="rounded-full p-2 group flex gap-2"
 									>
 										<Bot className="w-6 h-6 stroke-zinc-950 group-hover:stroke-zinc-800" />
 									</Button>

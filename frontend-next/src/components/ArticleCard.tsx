@@ -20,7 +20,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
 			<div className="p-4 flex flex-col gap-4 justify-between h-full">
 				<h2 className="font-semibold text-xl">{article.title}</h2>
 				<div className="flex justify-end">
-					<a href={article.article_url} target="_blank">
+					<a href={article.article_url}>
 						<Button>Read More</Button>
 					</a>
 				</div>
