@@ -24,5 +24,19 @@ for i in range(1, 11):
         print("Title:", title)
         print("Article URL:", article_url)
         print("Image URL:", image_url)
+
+        # Make a request to the article URL
+        article_response = requests.get(article_url)
+        article_soup = BeautifulSoup(article_response.content, "html.parser")
+
+        # Extract and print the article content
+        article_content = article_soup.find(
+            "div", class_="ArticleBody-articleBody")
+        if article_content:
+            print("Article Content:")
+            print(article_content.text.strip())
+        else:
+            print("Article content not found.")
+
         print("tags: []")
         print()
