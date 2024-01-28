@@ -97,10 +97,6 @@ def main() -> list[dict]:
         for i, link in enumerate(links):
             info = getInfoFromArticle(client, link)
             article_infos.append(info)
-
-            # TODO: Delete once you want all 100 articles
-            if i == 9:
-                break
     
     return article_infos
 

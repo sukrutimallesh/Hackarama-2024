@@ -8,7 +8,14 @@ from dotenv import load_dotenv
 import os
 from pinecone import Pinecone
 import openai
+import json
+import tiktoken
 
+def num_tokens_from_string(string: str, encoding_name: str) -> int:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
 
 def main() -> None:
     # Get info for embeddings and Pinecone
@@ -16,16 +23,18 @@ def main() -> None:
     pinecone_api_key: str = os.environ.get("PINECONE_API_KEY")
     openai_api_key: str = os.environ.get("OPENAI_API_KEY")
 
-    article_infos: list[dict] = yahoo.main()
-    
-    article_texts: list[str] = [article["article_content"] for article in article_infos]
+    # Read JSON data from the file into a list of dictionaries
+    with open("articles.json", 'r') as json_file:
+        articles: list[dict] = json.load(json_file)
+
+    article_texts: list[str] = [article["article_content"] for article in articles]
     article_metadatas : list[dict] = [
         {
-            "title": article["title"],
+            "title": article["title"] if isinstance(article["title"], str) else "",
             "article_url": article["article_url"],
             "image_url": article["image_url"] if isinstance(article["image_url"], str) else "",
             "tags": [],
-        } for article in article_infos
+        } for article in articles
     ]
 
     # Split all the texts into chunks (Documents)
@@ -36,6 +45,18 @@ def main() -> None:
         is_separator_regex=False,
     )
     documents = text_splitter.create_documents(article_texts, article_metadatas)
+
+    # Print out cost
+    num_tokens = 0
+    num_of_words = 0
+    for document in documents:
+        num_tokens += num_tokens_from_string(document.page_content, "cl100k_base")
+        num_of_words += len(document.page_content.split())
+
+    print("Total number of text chunks: " + str(len(documents)))
+    print("Total number of words: " + str(num_of_words))
+    print("Total number of tokens: " + str(num_tokens))
+    print("Total cost: ${:.2f}".format((num_tokens / 1000) * 0.00002))
 
     # Create Pinecone information
     pc = Pinecone(api_key=pinecone_api_key)
@@ -63,9 +84,6 @@ def main() -> None:
                 )
             ]
         )
-
-        # TODO: Delete to do all embeddings
-        break
     
     print("DONE!")
 

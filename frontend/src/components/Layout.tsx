@@ -1,7 +1,0 @@
-export default function Layout({ children }: { children: React.ReactNode }) {
-	return (
-		<div className="px-96 py-16 bg-zinc-200 min-w-full min-h-screen flex flex-col gap-8 text-zinc-950 font-inter">
-			{children}
-		</div>
-	);
-}
