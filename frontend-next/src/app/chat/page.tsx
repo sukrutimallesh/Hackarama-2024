@@ -16,7 +16,7 @@ const baseChatHistory: ChatHistoryObj[] = [
 	},
 	{
 		role: "user",
-		content: "This is my first question as a user.",
+		content: "Did anything happen in Oregon?",
 	},
 ];
 
@@ -35,8 +35,8 @@ export default function ChatPage() {
 				"Content-Type": "application/json",
 			},
 		});
-		const json: ChatHistoryObj[] = await res.json();
-		setChatHistory(json);
+		const json = await res.json();
+		setChatHistory(json["data"] as ChatHistoryObj[]);
 	}
 
 	return (
