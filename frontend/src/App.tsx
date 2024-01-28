@@ -109,6 +109,7 @@ const exampleData: Article[] = [
 function App() {
 	return (
 		<Layout>
+			<h1 className="text-5xl font-bold tracking-tight">News</h1>
 			<div className="grid grid-flow-row grid-cols-3 gap-4">
 				{exampleData.map((article: Article) => {
 					return <ArticleCard article={article} />;

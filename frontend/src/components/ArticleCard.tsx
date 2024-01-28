@@ -15,9 +15,9 @@ export default function ArticleCard({ article }: ArticleCardProps) {
 						alt={article.title}
 					/>
 				) : (
-					<div className="aspect-video object-cover w-full h-full bg-gradient-to-r from-cyan-500 to-blue-500"></div>
+					<div className="aspect-video object-cover w-full h-full bg-gradient-to-r from-zinc-500 to-zinc-600"></div>
 				)}
-				<h2 className="font-bold px-4 pb-4 group-hover:text-zinc-800">
+				<h2 className="font-semibold px-4 pb-4 group-hover:text-zinc-800">
 					{article.title}
 				</h2>
 			</div>
