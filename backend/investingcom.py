@@ -8,8 +8,8 @@ import time
 import httpx
 from httpx import Client
 
-BASE_URL: str = "https://www.investing.com"
-STOCK_MARKET_NEWS_URL: str = "https://www.investing.com/news/stock-market-news/"
+BASE_URL: str = f"https://www.investing.com"
+STOCK_MARKET_NEWS_URL: str = f"https://www.investing.com/news/stock-market-news/"
 
 def getArticleLinks(link: str) -> list[str] | None:
     # Make request to the news page
@@ -85,7 +85,7 @@ def main() -> None:
     all_links: list[str] = []
     for i in range(1, 6):
         # Create the current link by appending the current index number to the end of the URL
-        currentLink: str = STOCK_MARKET_NEWS_URL + str(i)
+        currentLink: str = f"https://www.investing.com/news/stock-market-news/{i}"
 
         # Get all the article links for the current news page
         links = getArticleLinks(currentLink)
