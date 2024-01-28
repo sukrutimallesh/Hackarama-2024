@@ -89,11 +89,9 @@ def main() -> None:
 
         # Get all the article links for the current news page
         links = getArticleLinks(currentLink)
-        all_links = all_links + links
-
-
-    pprint.pprint(all_links)
-    print(len(all_links))
+        
+        if links is not None:
+            all_links += links
 
     article_infos: list[dict] = []
 
