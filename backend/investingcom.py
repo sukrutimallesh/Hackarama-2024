@@ -1,12 +1,10 @@
 # investingcom.py - Get article links from investing.com.
 
-# Native imports
 import requests
 from bs4 import BeautifulSoup, Tag
-import csv
 import pprint
+import time
 
-# Third Party imports
 import httpx
 from httpx import Client
 
@@ -82,6 +80,7 @@ def getInfoFromArticle(client: Client, url:str) -> dict[str, str | list[str] | N
         "article_content": text_content,
     }
 
+
 def main() -> None:
     all_links: list[str] = []
     for i in range(1, 6):
@@ -92,6 +91,7 @@ def main() -> None:
         links = getArticleLinks(currentLink)
         all_links = all_links + links
 
+
     pprint.pprint(all_links)
     print(len(all_links))
 
@@ -101,10 +101,11 @@ def main() -> None:
     with httpx.Client(timeout=10) as client:
         for i, link in enumerate(all_links):
             info = getInfoFromArticle(client, link)
-            articles_info.append(info)
+            article_infos.append(info)
 
     pprint.pprint(article_infos)
     print(len(article_infos))
+
 
 if __name__ == "__main__":
     main()
