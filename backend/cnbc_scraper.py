@@ -1,42 +1,60 @@
 import requests
 from bs4 import BeautifulSoup
+import json
 
-for i in range(1, 11):
 
-    url = f"https://www.cnbc.com/financial-advisors/?page={i}"
+def main():
+    articles = []
 
-    response = requests.get(url)
+    for i in range(1, 11):
 
-    soup = BeautifulSoup(response.content, "html.parser")
+        url = f"https://www.cnbc.com/financial-advisors/?page={i}"
 
-    results = soup.find_all(
-        "div", class_="Card-standardBreakerCard Card-rectangleToLeftSquareMediaUltraDense Card-rectangleToLeftSquareMedia Card-card")
+        response = requests.get(url)
 
-    for result in results:
+        soup = BeautifulSoup(response.content, "html.parser")
 
-        title_element = result.find("a", class_="Card-title")
-        image_element = result.find("img", class_="Card-mediaContainerInner")
+        results = soup.find_all(
+            "div", class_="Card-standardBreakerCard Card-rectangleToLeftSquareMediaUltraDense Card-rectangleToLeftSquareMedia Card-card")
 
-        title = title_element.text
-        article_url = title_element["href"]
-        image_url = image_element["src"]
+        for result in results:
 
-        print("Title:", title)
-        print("Article URL:", article_url)
-        print("Image URL:", image_url)
+            title_element = result.find("a", class_="Card-title")
+            image_element = result.find(
+                "img", class_="Card-mediaContainerInner")
 
-        # Make a request to the article URL
-        article_response = requests.get(article_url)
-        article_soup = BeautifulSoup(article_response.content, "html.parser")
+            title = title_element.text
+            article_url = title_element["href"]
+            image_url = image_element["src"] if image_element else None
 
-        # Extract and print the article content
-        article_content = article_soup.find(
-            "div", class_="ArticleBody-articleBody")
-        if article_content:
-            print("Article Content:")
-            print(article_content.text.strip())
-        else:
-            print("Article content not found.")
+            # Make a request to the article URL
+            article_response = requests.get(article_url)
+            article_soup = BeautifulSoup(
+                article_response.content, "html.parser")
 
-        print("tags: []")
-        print()
+            # Extract article content
+            article_content_element = article_soup.find(
+                "div", class_="ArticleBody-articleBody")
+            article_content = article_content_element.text.strip(
+            ) if article_content_element else ""
+
+            # Create Article object
+            article = {
+                "title": title,
+                "article_url": article_url,
+                "image_url": image_url,
+                "tags": [],
+                "article_content": article_content
+            }
+
+            articles.append(article)
+
+    # Convert the list of Article objects to JSON format
+    articles_json = json.dumps(articles, indent=2)
+
+    # Print the JSON data
+    print(articles_json)
+
+
+if __name__ == "__main__":
+    main()
