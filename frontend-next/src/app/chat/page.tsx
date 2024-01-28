@@ -55,6 +55,7 @@ export default function ChatPage() {
 			{chatsToDisplay.map((chatObj) => {
 				return (
 					<ChatSection
+						key={chatObj.content}
 						isAI={chatObj.role === "assistant"}
 						text={chatObj.content}
 					/>
