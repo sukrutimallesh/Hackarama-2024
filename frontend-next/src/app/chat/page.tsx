@@ -12,7 +12,7 @@ const baseChatHistory: ChatHistoryObj[] = [
 	{
 		role: "system",
 		content:
-			"You are a helpful assistant with information about financial news. Utilize the context that is given to you to answer the user's questions. If the context does not provide an answer to you, then simply state \"I don't know the answer to that.\"",
+			"You are a helpful assistant with information about financial news. Utilize the context that is given to you to best answer the user's question.",
 	},
 ];
 
@@ -31,6 +31,8 @@ export default function ChatPage() {
 			role: "user",
 			content: chatMessage,
 		});
+
+		setChatMessage("");
 
 		const res = await fetch("/api", {
 			method: "POST",
@@ -61,29 +63,31 @@ export default function ChatPage() {
 					/>
 				);
 			})}
-			<div className="flex flex-col gap-4 fixed bottom-16 left-1/2 transform -translate-x-1/2 min-w-[512px]">
-				<Textarea
-					value={chatMessage}
-					onChange={(e) => setChatMessage(e.target.value)}
-					placeholder="Ask a question here"
-					className="resize-y drop-shadow-lg w-full"
-				/>
-				<div className="flex flex-col gap-2">
-					<Button
-						onClick={getAIResponse}
-						className="w-full flex gap-1"
-					>
-						<span>Ask</span>
-						<Sparkles className="w-4 h-4" />
-					</Button>
-					<Link href="/" className="w-full">
+			<div className="w-full flex justify-center pt-8">
+				<div className="flex flex-col gap-4 w-1/2">
+					<Textarea
+						value={chatMessage}
+						onChange={(e) => setChatMessage(e.target.value)}
+						placeholder="Ask a question here"
+						className="resize-y drop-shadow-lg w-full"
+					/>
+					<div className="flex flex-col gap-2">
 						<Button
-							variant="outline"
-							className="border-zinc-300 w-full"
+							onClick={getAIResponse}
+							className="w-full flex gap-1"
 						>
-							Go back to News
+							<span>Ask</span>
+							<Sparkles className="w-4 h-4" />
 						</Button>
-					</Link>
+						<Link href="/" className="w-full">
+							<Button
+								variant="outline"
+								className="border-zinc-300 w-full"
+							>
+								Go back to News
+							</Button>
+						</Link>
+					</div>
 				</div>
 			</div>
 		</main>
