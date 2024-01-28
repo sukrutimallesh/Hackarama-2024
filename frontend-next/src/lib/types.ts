@@ -5,3 +5,8 @@ export type Article = {
 	tags: string[];
 	article_content: string;
 };
+
+export type ChatHistoryObj = {
+	role: "system" | "user" | "assistant";
+	content: string;
+}
