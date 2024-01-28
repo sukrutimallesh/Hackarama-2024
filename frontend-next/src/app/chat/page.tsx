@@ -4,9 +4,8 @@ import ChatSection from "@/components/ChatSection";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { ChatHistoryObj } from "@/lib/types";
-
-const lorem =
-	"Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, nulla voluptate praesentium reiciendis unde iste, dolorum vero excepturi accusamus velit numquam pariatur voluptatem enim laborum alias. Debitis itaque pariatur sapiente? Neque officiis, obcaecati aliquam perferendis ex eligendi eius dicta commodi a veniam voluptatem fugiat esse in quaerat magnam, laborum ducimus voluptatibus illum autem, animi quasi necessitatibus impedit itaque? Vel, dolor? Voluptatum dignissimos quod magni, iusto quidem, eligendi vitae rem quae, asperiores ducimus ea illum reiciendis. Quis perspiciatis non assumenda iure quas excepturi laboriosam eligendi, rem doloribus velit consequuntur ratione est! Quidem quisquam at error aperiam dignissimos atque odit ullam tempora aut eligendi mollitia aliquid nobis adipisci minima, ex asperiores voluptatem fuga. Maxime quos asperiores consequatur illo aliquam, eum iure placeat! Quasi sunt voluptas esse cum, qui enim error. Rerum architecto optio error facere possimus nisi mollitia quod tempora nulla sint? Et ab neque, accusantium nam dicta facilis laudantium veritatis quos.";
+import { Textarea } from "@/components/ui/textarea";
+import Link from "next/link";
 
 const baseChatHistory: ChatHistoryObj[] = [
 	{
@@ -14,27 +13,32 @@ const baseChatHistory: ChatHistoryObj[] = [
 		content:
 			"You are a helpful assistant with information about financial news. Utilize the context that is given to you to answer the user's questions. If the context does not provide an answer to you, then simply state \"I don't know the answer to that.\"",
 	},
-	{
-		role: "user",
-		content: "Did anything happen in Oregon?",
-	},
 ];
 
 export default function ChatPage() {
+	const [chatMessage, setChatMessage] = useState<string>("");
 	const [chatHistory, setChatHistory] =
 		useState<ChatHistoryObj[]>(baseChatHistory);
 
 	// Filter out system chats
 	const chatsToDisplay = chatHistory.filter((chat) => chat.role !== "system");
 
-	async function testAPI() {
+	async function getAIResponse() {
+		// Add the new message to a "fake" chat history essentially
+		let historyToSend = chatHistory;
+		historyToSend.push({
+			role: "user",
+			content: chatMessage,
+		});
+
 		const res = await fetch("/api", {
 			method: "POST",
-			body: JSON.stringify(chatHistory),
+			body: JSON.stringify(historyToSend),
 			headers: {
 				"Content-Type": "application/json",
 			},
 		});
+
 		const json = await res.json();
 		setChatHistory(json["data"] as ChatHistoryObj[]);
 	}
@@ -55,7 +59,27 @@ export default function ChatPage() {
 					/>
 				);
 			})}
-			<Button onClick={testAPI}>Test</Button>
+			<div className="flex flex-col gap-4 fixed bottom-16 left-1/2 transform -translate-x-1/2 min-w-[512px]">
+				<Textarea
+					value={chatMessage}
+					onChange={(e) => setChatMessage(e.target.value)}
+					placeholder="Ask a question here"
+					className="resize-y drop-shadow-lg w-full"
+				/>
+				<div className="flex flex-col gap-2">
+					<Button onClick={getAIResponse} className="w-full">
+						Ask
+					</Button>
+					<Link href="/" className="w-full">
+						<Button
+							variant="outline"
+							className="border-zinc-300 w-full"
+						>
+							Go back to News
+						</Button>
+					</Link>
+				</div>
+			</div>
 		</main>
 	);
 }
