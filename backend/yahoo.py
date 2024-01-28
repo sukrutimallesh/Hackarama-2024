@@ -85,7 +85,7 @@ def getInfoFromArticle(client: Client, url: str) -> dict[str, str | list[str] | 
     }
 
 
-def main() -> None:
+def main() -> list[dict]:
     # Get the links, only keep 100 of them if > 100 options
     links: list[str] = getLinksFromNewsPage()
     links = links[:100] if len(links) > 100 else links
@@ -102,8 +102,7 @@ def main() -> None:
             if i == 9:
                 break
     
-    pprint.pprint(article_infos)
-    print(len(article_infos))
+    return article_infos
 
 if __name__ == "__main__":
     main()

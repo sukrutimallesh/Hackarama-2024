@@ -3,8 +3,8 @@ from bs4 import BeautifulSoup
 import json
 
 
-def main():
-    articles = []
+def main() -> list[dict]:
+    articles: list[dict] = []
 
     for i in range(1, 11):
 
@@ -49,11 +49,13 @@ def main():
 
             articles.append(article)
 
-    # Convert the list of Article objects to JSON format
-    articles_json = json.dumps(articles, indent=2)
+    return articles
 
-    # Print the JSON data
-    print(articles_json)
+    # # Convert the list of Article objects to JSON format
+    # articles_json = json.dumps(articles, indent=2)
+
+    # # Print the JSON data
+    # print(articles_json)
 
 
 if __name__ == "__main__":
